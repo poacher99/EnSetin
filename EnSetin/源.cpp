@@ -1,6 +1,7 @@
 #include<iostream>
 using namespace std;
+#include"inter.h"
 
 int main() {
-	cout << "Hello World!";
+	cout << 1;
 }
