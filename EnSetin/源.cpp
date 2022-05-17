@@ -126,7 +126,8 @@ int main() {
 			if (win == -1) {
 				cout << "¶ÔÊÖÊ¤Àû£¡\n"; break;
 			}
-
+			delete ai->judge;
+			delete ai;
 			turn++;
 		}
 	}
