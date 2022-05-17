@@ -21,9 +21,6 @@
     <ClCompile Include="pre_Define.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="inter.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="AI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -32,9 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inter.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="pre_Define.h">
       <Filter>头文件</Filter>
     </ClInclude>
