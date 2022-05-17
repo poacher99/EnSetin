@@ -44,4 +44,7 @@ public:
 
 	//获得新的随机移动步法
 	int getnewrand();
+
+	//删除树
+	void delete_tree(tree* root);
 };

@@ -17,15 +17,14 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 	tree* root = new tree;
 	root->fx = fx;
 	root->fy = fy;
-	int T = 50;
-	if (root->child[0][1]!=NULL&&root->child[0][1]->child[0][1] != NULL)cout << "yes\n";
+	int T = 20000;
 	while (T--) {
 		int if_win;
 		judge->set_new_Board();
 		tree* p = root;
 		//行棋步数
 		int step = 0;
-		while (p) {
+		while (1) {
 			
 			step++;
 			all++;
@@ -47,7 +46,7 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 				point a;
 				if (p == root) { a.x = fx; a.y = fy; }
 				else {
-					a = judge->findChessman2(k, step % 2);
+					a = judge->findChessman2(k+1, step % 2);
 					if (a.x == -1 || a.y == -1)continue;
 
 				}
@@ -72,12 +71,12 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 				if (step == 1)break;
 				if (quit)break;
 			}
+
 			//移动棋子
-			judge->moveChessman(tx, ty, tx + judge->legal[flag].x, ty + judge->legal[flag].y);
-			for (int i = 0; i < 5; i++) {
-				for (int j = 0; j < 5; j++)cout << judge->new_board[i][j];
-				cout << '\n';
-			}
+			if(step%2)
+				judge->moveChessman(tx, ty, tx + judge->legal[flag].x, ty + judge->legal[flag].y);
+			else
+				judge->moveChessman(tx, ty, tx - judge->legal[flag].x, ty - judge->legal[flag].y);
 			//1为胜利，-1为失败
 			if_win = judge->End();
 			//找到下一个节点
@@ -90,8 +89,14 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 			}
 			tree* q = new tree;
 			q->parent = p;
-			q->fx = tx + judge->legal[flag].x;
-			q->fy = ty + judge->legal[flag].y;
+			if (step % 2) {
+				q->fx = tx + judge->legal[flag].x;
+				q->fy = ty + judge->legal[flag].y;
+			}
+			else {
+				q->fx = tx - judge->legal[flag].x;
+				q->fy = ty - judge->legal[flag].y;
+			}
 			q->n++;
 			p->child[flag2][flag] = q;
 			int win = Mock(judge->new_board, step % 2);
@@ -109,6 +114,8 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 		}
 
 	}
+
+	delete_tree(root);
 	return { flag,score };
 }
 
@@ -118,17 +125,18 @@ int AI:: Mock(char b[5][5],int camp) {
 
 	//是否结束循环
 	int flag=0 ;
+
+	static uniform_int_distribution<int> u(1, 6);
+	static default_random_engine e2;
 	while (1) {
+		camp = 1 - camp;
 		flag = judge->End();
 		if (flag == 1 || flag == -1)break;
-		static uniform_int_distribution<int> u(1, 6);
-		static default_random_engine e2;
 		int rand = u(e2);
 		point a = judge->findChessman2(rand, camp);
 		if (a.x == -1 || a.y == -1)continue;
 		point b = get_Randommove(a, camp);
 		judge->moveChessman(a.x, a.y,b.x,b.y);
-		camp = 1 - camp;
 	}
 	return flag;
 }
@@ -195,3 +203,17 @@ int AI::getnewrand() {
 	static default_random_engine e;
 	return u(e);
 }
+
+void AI::delete_tree(tree* root)
+{
+
+	if (root == NULL)return;
+	for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 3; j++) {
+			delete_tree(root->child[i][j]);
+		}
+	}
+	delete root;
+}
+
+

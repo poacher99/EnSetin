@@ -1,5 +1,4 @@
 #include"AI.h"
-#include"inter.h"
 #include"pre_Define.h"
 #include"Referee.h"
 #include<cmath>
@@ -12,6 +11,13 @@ int Referee::owner(int fx, int fy) {
 	else if (board[fx][fy] == '0')return 0;
 	else return -1;
 
+}
+
+void Referee::set_board(char b[5][5])
+{
+	for (int i = 0; i < 5; i++)
+		for (int j = 0; j < 5; j++)this->board[i][j] = b[i][j];
+	return;
 }
 
 void Referee::set_new_Board() {

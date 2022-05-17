@@ -12,8 +12,10 @@ public:
 			{0,1},{1,0},{1,1}
 	};
 	
-
 	//设置初始棋盘
+	void set_board(char b[5][5]);
+
+	//重置初始棋盘
 	void set_new_Board();
 
 	//查找可移动棋子，返回坐标
