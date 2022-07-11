@@ -19,11 +19,16 @@ void game(int flag, int start);
 
 int main() {
 
-
+	cout << "当前棋盘：\n";
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++)cout << a[i][j] << ' ';
+		cout << '\n';
+	}
 	//1开始,0为准备阶段
 	int start = 0;
 	//准备阶段
 	while (1) {
+		
 
 		cout << "是否开始？ 输入1开始，输入0调整棋子" << endl;
 		cin >> start;
@@ -43,7 +48,7 @@ int main() {
 	}
 	//1先手，0后手
 	int flag;
-	cout << "选择先后手" << endl;
+	cout << "选择先后手: (输入1先手，输入0后手)" << endl;
 	cin >> flag;
 		
 	Game g(a,flag, start);

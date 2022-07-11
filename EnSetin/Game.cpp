@@ -1,21 +1,26 @@
 #include "Game.h"
+#include<vector>
 
 Game::Game(char b[5][5], int flag, int start)
 {
-
+	
 	this->flag = flag;
 	this->start = start;
 	for (int i = 0; i < 5; i++)
 		for (int j = 0; j < 5; j++)a[i][j] = b[i][j];
+	for (int i = 0; i < 5; i++)
+		for (int j = 0; j < 5; j++)root->now_a[i][j] = a[i][j];
 
 }
 
 void Game::game()
 {
+	Board_link* p = root;
 	if (flag == 1) {
 		AI* ai = new AI(a);
 		int turn = 1;
 		while (1) {
+
 			int rand;
 			printf("第%d回合：\n", turn);
 			//检查输入数组
@@ -23,6 +28,28 @@ void Game::game()
 				for (int j = 0; j < 5; j++)
 					cout << ai->judge->new_board[i][j]<<' ';
 				cout << '\n';
+			}
+			cout << '\n';
+			//退回上一回合棋盘
+			if (turn > 1) {
+
+				cout << "是否返回上一回合的棋盘? 输入y返回，其他继续";
+				char c;
+				cin >> c;
+				if (c == 'y') {
+					if (p != root) {
+						Board_link* q = p;
+						p = p->last;
+						delete q;
+						for (int i = 0; i < 5; i++)
+							for (int j = 0; j < 5; j++)  a[i][j] = p->now_a[i][j];
+					}
+					turn--;
+					ai->judge->set_board(a);
+					ai->judge->set_new_Board();
+					continue;
+				}                
+
 			}
 			cout << '\n';
 			cout << "请输入你掷得的骰子数\n";
@@ -41,7 +68,7 @@ void Game::game()
 			if (same) {
 				next1 = ai->UCT_Search(chessFind.x.x, chessFind.x.y);
 				select = next1.x;
-				chessnumber = rand;
+				chessnumber = findchessman(chessFind.x.x,chessFind.x.y);
 			}
 			else {
 				next1 = ai->UCT_Search(chessFind.x.x, chessFind.x.y);
@@ -126,7 +153,29 @@ void Game::game()
 
 			turn++;
 			cout << '\n';
+
+			//退回上一回合棋盘
+			if (turn > 1) {
+
+				cout << "是否返回上一回合的棋盘? 输入y返回，其他继续";
+				char c;
+				cin >> c;
+				if (c == 'y') { 
+					back_Board(p); turn--;
+					ai->judge->set_board(a);
+					ai->judge->set_new_Board();
+				}
+				else {
+					Board_link* q=new Board_link;
+					q->last = p;
+					for (int i = 0; i < 5; i++)
+						for (int j = 0; j < 5; j++)q->now_a[i][j] = a[i][j];
+					p = q;
+				}
+
+			}
 		}
+		delete_board(p);
 		delete ai->judge;
 		delete ai;
 	}
@@ -141,6 +190,28 @@ void Game::game()
 				for (int j = 0; j < 5; j++)
 					cout << ai->judge->new_board[i][j]<<' ';
 				cout << '\n';
+			}
+			cout << '\n';
+			//退回上一回合棋盘
+			if (turn > 1) {
+
+				cout << "是否返回上一回合的棋盘? 输入y返回，其他继续";
+				char c;
+				cin >> c;
+				if (c == 'y') {
+					if (p != root) {
+						Board_link* q = p;
+						p = p->last;
+						delete q;
+						for (int i = 0; i < 5; i++)
+							for (int j = 0; j < 5; j++)  a[i][j] = p->now_a[i][j];
+					}
+					turn--;
+					ai->judge->set_board(a);
+					ai->judge->set_new_Board();
+					continue;
+				}
+
 			}
 			//对手行棋
 			cout << "请对手移动棋子\n";
@@ -213,7 +284,7 @@ void Game::game()
 			if (same) {
 				next1 = ai->UCT_Search(chessFind.x.x, chessFind.x.y);
 				select = next1.x;
-				chessnumber = rand;
+				chessnumber = findchessman(chessFind.x.x,chessFind.x.y);
 			}
 			else {
 				next1 = ai->UCT_Search(chessFind.x.x, chessFind.x.y);
@@ -250,12 +321,56 @@ void Game::game()
 
 			turn++;
 			cout << '\n';
+
+			//退回上一回合棋盘
+			if (turn > 1) {
+
+				cout << "是否返回上一回合的棋盘? 输入y返回，其他继续";
+				char c;
+				cin >> c;
+				if (c == 'y') {
+					back_Board(p); 
+					turn--;
+					ai->judge->set_board(a);
+					ai->judge->set_new_Board();
+				}
+				else {
+					Board_link* q = new Board_link;
+					q->last = p;
+					for (int i = 0; i < 5; i++)
+						for (int j = 0; j < 5; j++)q->now_a[i][j] = a[i][j];
+					p = q;
+					ai->judge->set_board(a);
+					ai->judge->set_new_Board();
+				}
+
+			}
 		}
+		delete_board(p);
 		delete ai->judge;
 		delete ai;
 	}
 	return;
 }
+
+void Game::back_Board(Board_link* p)
+{
+	for (int i = 0; i < 5; i++)
+		for (int j = 0; j < 5; j++)  a[i][j]=p->now_a[i][j];
+	
+}
+
+void Game::delete_board(Board_link* p)
+{
+	if (p == NULL)return;
+	Board_link* q = p->last;
+	delete p;
+	return delete_board(q);
+}
+
+
+
+
 
 void Game::movechessman(int fx, int fy, int tx, int ty, int start) {
 	if (start) {
@@ -283,3 +398,11 @@ point Game:: findchessman(int n) {
 			if (a[i][j] == n + 'A' - 1)return { i,j };
 		}
 }
+//根据坐标查找编号
+int Game:: findchessman(int fx,int fy) {
+	char c = a[fx][fy];
+	return c - 'A' + 1;
+}
+
+
+

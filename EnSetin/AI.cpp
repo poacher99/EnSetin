@@ -12,12 +12,11 @@ AI::AI(char b[5][5]) {
 
 pair<int, double> AI::UCT_Search( int fx, int fy) {
 
-
 	//创建根结点
 	tree* root = new tree;
 	root->fx = fx;
 	root->fy = fy;
-	int T = 20000;
+	int T = 50000;
 	while (T--) {
 		int if_win;
 		judge->set_new_Board();
@@ -25,7 +24,7 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 		//行棋步数
 		int step = 0;
 		while (1) {
-			
+
 			step++;
 			all++;
 			//记录选择的移动，-1为未选择
@@ -44,15 +43,18 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 				//判断是否退出选择
 				int quit = 0;
 				point a;
-				if (p == root) { a.x = fx; a.y = fy; }
+				if (p == root) {
+					a.x = fx; a.y = fy;
+				}
 				else {
-					a = judge->findChessman2(k+1, step % 2);
+					a = judge->findChessman2(k + 1, step % 2);
 					if (a.x == -1 || a.y == -1)continue;
 
 				}
+				if (step > 1)score = -0x7f7f7f7f;
 				//选择移动步法
 				for (int i = 0; i < 3; i++) {
-					if (judge->validMove(a.x, a.y, a.x + judge->legal[i].x, a.y + judge->legal[i].y,step%2)) {
+					if (step % 2 == 1 && judge->validMove(a.x, a.y, a.x + judge->legal[i].x, a.y + judge->legal[i].y, step % 2)) {
 						if (p->child[k][i] == NULL) {
 							flag = i;
 							flag2 = k;
@@ -67,16 +69,33 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 							tx = a.x; ty = a.y;
 						}
 					}
+					if (step % 2 == 0 && judge->validMove(a.x, a.y, a.x - judge->legal[i].x, a.y - judge->legal[i].y, step % 2)) {
+						if (p->child[k][i] == NULL) {
+							flag = i;
+							flag2 = k;
+							tx = a.x;
+							ty = a.y;
+							quit = 1;
+							break;
+						}
+						double now_score = getUCTvalue(p->child[k][i], step % 2);
+						if (now_score > score) {
+							score = now_score; flag = i; flag2 = k;
+							tx = a.x; ty = a.y;
+						}
+					}
+					
 				}
 				if (step == 1)break;
 				if (quit)break;
 			}
-
+			if (flag == -1 || flag2 == -1)continue;
 			//移动棋子
-			if(step%2)
+			if (step % 2)
 				judge->moveChessman(tx, ty, tx + judge->legal[flag].x, ty + judge->legal[flag].y);
-			else
+			else {
 				judge->moveChessman(tx, ty, tx - judge->legal[flag].x, ty - judge->legal[flag].y);
+			}
 			//1为胜利，-1为失败
 			if_win = judge->End();
 			//找到下一个节点
@@ -146,12 +165,12 @@ double AI::getUCTvalue(tree* p, int camp) {
 	if (camp == 1) {
 	int v = p->v;
 	int n = p->n;
-	return v / n + sqrt(log(all) / n);
+	return (1.0 * v / n) + 10*sqrt(log(all) / n);
 	}
 	else {
-		int v = p->v;
-		int n = p->n;
-		return (1.0-(v / n)) + sqrt(log(all) / n);
+		double v = p->v;
+		double n = p->n;
+		return (1.0 * v / n)  + 10*sqrt(log(all) / n);
 	}
 }
 

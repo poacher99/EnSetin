@@ -87,7 +87,10 @@ point Referee::findChessman2(int k, int camp) {
 
 int Referee::validMove(int fx, int fy, int tx, int ty,int camp) {
 	if (camp == 1) {
+		int m = tx - fx + ty - fy;
 		if ((tx - fx) > 1 || (ty - fy) > 1)return 0;
+		if (m == 0)return 0;
+		if (m > 2)return 0;
 		if (tx <= 4 && ty <= 4)return 1;
 	}
 	else {
