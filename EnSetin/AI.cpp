@@ -23,7 +23,7 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 	tree* root = new tree;
 	root->fx = fx;
 	root->fy = fy;
-	int T = 5000;
+	int T = 50000;
 	while (T--) {
 		int if_win;
 		judge->set_new_Board();
@@ -135,7 +135,9 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 	double score = 0;
 	for (int i = 0; i < 3; i++) {
 		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y, 1)) {
-			double now_score = getUCTvalue(root->child[0][i], 1);
+			double v = root->child[0][i]->v;
+			double n = root->child[0][i]->n;
+			double now_score = v/n;
 			if (now_score > score) { score = now_score; flag = i; }
 		}
 
@@ -172,12 +174,12 @@ double AI::getUCTvalue(tree* p, int camp) {
 	if (camp == 1) {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n) +  10*sqrt(1.96*log(all) / n);
+		return (1.0 * v / n) +  5*sqrt(1.96*log(all) / n);
 	}
 	else {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n) + 10*sqrt(1.96*log(all) / n);
+		return (1.0 * v / n) + 5*sqrt(1.96*log(all) / n);
 	}
 }
 
