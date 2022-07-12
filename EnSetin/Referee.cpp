@@ -66,7 +66,7 @@ pair<point,point> Referee::findChessman(int num,int camp) {
 
 point Referee::findChessman2(int k, int camp) {
 	char chessman_red[7] = { '0','A','B','C','D','E','F' };
-	char chessman_blu[7] = { '0','a','b','c','c','e','f' };
+	char chessman_blu[7] = { '0','a','b','c','d','e','f' };
 	if (camp == 1) {
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {

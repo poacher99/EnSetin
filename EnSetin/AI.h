@@ -47,4 +47,7 @@ public:
 
 	//É¾³ýÊ÷
 	void delete_tree(tree* root);
+
+
+
 };

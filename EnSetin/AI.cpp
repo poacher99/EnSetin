@@ -3,6 +3,10 @@
 #include<cmath>
 
 AI::AI(char b[5][5]) {
+
+	//创建随机数种子
+	unsigned seed = time(0);
+	srand(seed);
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++)judge->board[i][j] = b[i][j];
 	}
@@ -11,6 +15,7 @@ AI::AI(char b[5][5]) {
 
 
 pair<int, double> AI::UCT_Search(int fx, int fy) {
+
 
 	for (int i = 0; i < 3; i++) {
 		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y,1)) {
@@ -23,7 +28,7 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 	tree* root = new tree;
 	root->fx = fx;
 	root->fy = fy;
-	int T = 50000;
+	int T = 30000;
 	while (T--) {
 		int if_win;
 		judge->set_new_Board();
@@ -137,13 +142,15 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y, 1)) {
 			double v = root->child[0][i]->v;
 			double n = root->child[0][i]->n;
-			double now_score = v/n;
+			double now_score = n;
 			if (now_score > score) { score = now_score; flag = i; }
+			cout << now_score <<' ' <<v/n<< endl;
 		}
 
 	}
 
 	delete_tree(root);
+	
 	return { flag,score };
 }
 
@@ -153,16 +160,23 @@ int AI::Mock(char b[5][5], int camp) {
 
 	//是否结束循环
 	int flag = 0;
-
-	static uniform_int_distribution<int> u(1, 6);
-	static default_random_engine e2;
+	//static uniform_int_distribution<int> u(1, 6);
+	//static default_random_engine e2;
 	while (1) {
 		camp = 1 - camp;
 		flag = judge->End();
 		if (flag == 1 || flag == -1)break;
-		int rand = u(e2);
-		point a = judge->findChessman2(rand, camp);
-		if (a.x == -1 || a.y == -1)continue;
+		point a;
+		while (1) {
+			int randn = rand() % 6 + 1;
+			a = judge->findChessman2(randn, camp);
+			if (a.x == -1 || a.y == -1) { 
+				flag = judge->End();
+				if (flag == 1 || flag == -1)return flag;
+				continue;
+			}
+			break;
+		}
 		point b = get_Randommove(a, camp);
 		judge->moveChessman(a.x, a.y, b.x, b.y);
 	}
@@ -170,16 +184,18 @@ int AI::Mock(char b[5][5], int camp) {
 }
 
 
+
+
 double AI::getUCTvalue(tree* p, int camp) {
 	if (camp == 1) {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n) +  5*sqrt(1.96*log(all) / n);
+		return (1.0 * v / n) + sqrt(log(all) / n);
 	}
 	else {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n) + 5*sqrt(1.96*log(all) / n);
+		return (1.0 * v / n) + sqrt(log(all) / n);
 	}
 }
 
@@ -211,9 +227,7 @@ point AI::get_Randommove(point a, int camp) {
 
 
 int AI::renewRandom() {
-	uniform_int_distribution<int> u(1, 6);
-	default_random_engine e;
-	int now_random = u(e);
+	int now_random = rand()%6+1;
 	return now_random;
 }
 
@@ -227,9 +241,8 @@ void AI::back(tree* p, int win, int step) {
 }
 
 int AI::getnewrand() {
-	static uniform_int_distribution<int> u(0, 2);
-	static default_random_engine e;
-	return u(e);
+	int u = rand() % 3;
+	return u;
 }
 
 void AI::delete_tree(tree* root)

@@ -24,7 +24,6 @@ public:
 	//第二层及之后查找棋子,仅仅返回对应的棋子
 	point findChessman2(int k, int camp);
 		
-
 	//当前随机数
 	int now_random = 0;
 
