@@ -10,13 +10,20 @@ AI::AI(char b[5][5]) {
 }
 
 
-pair<int, double> AI::UCT_Search( int fx, int fy) {
+pair<int, double> AI::UCT_Search(int fx, int fy) {
 
+	for (int i = 0; i < 3; i++) {
+		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y,1)) {
+			judge->moveChessman(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y);
+			if (judge->End() == 1)return {i,double(0x0f7f7f7f)};
+		}
+	}
+	judge->set_new_Board();
 	//创建根结点
 	tree* root = new tree;
 	root->fx = fx;
 	root->fy = fy;
-	int T = 50000;
+	int T = 5000;
 	while (T--) {
 		int if_win;
 		judge->set_new_Board();
@@ -84,7 +91,7 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 							tx = a.x; ty = a.y;
 						}
 					}
-					
+
 				}
 				if (step == 1)break;
 				if (quit)break;
@@ -127,7 +134,7 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 	int flag = -1;
 	double score = 0;
 	for (int i = 0; i < 3; i++) {
-		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y,1)) {
+		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y, 1)) {
 			double now_score = getUCTvalue(root->child[0][i], 1);
 			if (now_score > score) { score = now_score; flag = i; }
 		}
@@ -140,10 +147,10 @@ pair<int, double> AI::UCT_Search( int fx, int fy) {
 
 
 
-int AI:: Mock(char b[5][5],int camp) {
+int AI::Mock(char b[5][5], int camp) {
 
 	//是否结束循环
-	int flag=0 ;
+	int flag = 0;
 
 	static uniform_int_distribution<int> u(1, 6);
 	static default_random_engine e2;
@@ -155,7 +162,7 @@ int AI:: Mock(char b[5][5],int camp) {
 		point a = judge->findChessman2(rand, camp);
 		if (a.x == -1 || a.y == -1)continue;
 		point b = get_Randommove(a, camp);
-		judge->moveChessman(a.x, a.y,b.x,b.y);
+		judge->moveChessman(a.x, a.y, b.x, b.y);
 	}
 	return flag;
 }
@@ -163,25 +170,25 @@ int AI:: Mock(char b[5][5],int camp) {
 
 double AI::getUCTvalue(tree* p, int camp) {
 	if (camp == 1) {
-	int v = p->v;
-	int n = p->n;
-	return (1.0 * v / n) + 10*sqrt(log(all) / n);
+		double v = p->v;
+		double n = p->n;
+		return (1.0 * v / n) +  10*sqrt(1.96*log(all) / n);
 	}
 	else {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n)  + 10*sqrt(log(all) / n);
+		return (1.0 * v / n) + 10*sqrt(1.96*log(all) / n);
 	}
 }
 
-point AI::get_Randommove(point a,int camp) {
+point AI::get_Randommove(point a, int camp) {
 
-	
+
 	int fx = a.x, fy = a.y;
 	int tx, ty;
 	point p;
 	while (1) {
-		
+
 		int n = getnewrand();
 		if (camp == 1) {
 			tx = fx + judge->legal[n].x;
@@ -208,7 +215,7 @@ int AI::renewRandom() {
 	return now_random;
 }
 
-void AI:: back(tree* p,int win,int step) {
+void AI::back(tree* p, int win, int step) {
 	if (win != 1)return;
 	while (p) {
 		p->v++;

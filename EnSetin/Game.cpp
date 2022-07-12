@@ -179,6 +179,7 @@ void Game::game()
 		delete ai->judge;
 		delete ai;
 	}
+	//∫Û ÷
 	else {
 
 		AI* ai = new AI(a);
