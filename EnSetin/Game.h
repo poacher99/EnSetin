@@ -1,11 +1,15 @@
 #pragma once
 #include"AI.h"
+#include<fstream>
+using namespace std;
 
 class Game
 {
 public:
 	//当前棋盘
 	char a[5][5];
+	ofstream outfile;
+	ifstream infile;
 
 	//保存每一步棋盘的数组
 	struct Board_link {
@@ -38,6 +42,9 @@ public:
 
 	//删除保存的所有棋盘
 	void delete_board(Board_link* p);
+
+	//根据棋子编号返回名称
+	char findchessname(char b[5][5], int n, int team);
 
 };
 

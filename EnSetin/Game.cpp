@@ -15,6 +15,20 @@ Game::Game(char b[5][5], int flag, int start)
 
 void Game::game()
 {
+
+	//保存操作到文本文档
+	infile.open("input.txt", ios::app);
+	int play_counts;
+	infile >>play_counts;
+	infile.close();
+	outfile.open("output.txt", ios::app);
+	outfile <<'\n' << "第"<<play_counts<<"局：" << endl;
+	outfile.close();
+	outfile.open("input.txt");
+	outfile << play_counts+1 << endl;
+	outfile.close();
+
+
 	Board_link* p = root;
 	if (flag == 1) {
 		AI* ai = new AI(a);
@@ -44,10 +58,16 @@ void Game::game()
 						for (int i = 0; i < 5; i++)
 							for (int j = 0; j < 5; j++)  a[i][j] = p->now_a[i][j];
 					}
+					//保存操作到文本文档
+					outfile.open("output.txt",ios::app);
+					outfile << "退回到上一个回合开始时的棋盘状态"<<endl;
+					outfile.close();
+
 					turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
 					continue;
+
 				}                
 
 			}
@@ -86,6 +106,14 @@ void Game::game()
 			movechessman(next.x, next.y, next.x + ai->judge->legal[select].x, next.y + ai->judge->legal[select].y, start);
 			ai->judge->set_board(a);
 			ai->judge->set_new_Board();
+
+			//保存操作到文本文档
+			outfile.open("output.txt",ios::app);
+			outfile << "我方掷得骰子数：" << rand << endl;
+			outfile << "我方行棋为： " << findchessname(ai->judge->new_board, chessnumber, 1) << ' ' << "走 " << next.x + ai->judge->legal[select].x << ',' << next.y + ai->judge->legal[select].y<<endl;
+			outfile.close();
+
+
 			cout << "当前棋盘：\n";
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 5; j++)
@@ -103,9 +131,12 @@ void Game::game()
 			}
 
 			//对手移动
-			cout << "请对手移动棋子\n";
+			cout << "请输入对手的骰子数，并移动棋子\n";
 			while (1) {
 				char c;
+				char e_randon;
+				cin >> e_randon; 
+				if (e_randon < '1' || e_randon>'6') { cout << "输入有误，重新输入对手移动的棋子\n"; continue; }
 				cin >> c;
 				point c_point = findchessman(c);
 				int tx, ty;
@@ -114,9 +145,18 @@ void Game::game()
 				if ((c_point.x - tx) > 1 || (c_point.y - ty) > 1 || c > 'f' || c < 'a' || (tx == c_point.x && ty == c_point.y)) {
 					cout << "输入有误，重新输入对手移动的棋子\n"; continue;
 				}
+				
+
 				//备份移动吃的棋子
 				char backup = a[tx][ty];
 				movechessman(c_point.x, c_point.y, tx, ty, start);
+
+				//保存操作到文本文档
+				outfile.open("output.txt", ios::app);
+				outfile << "敌方掷得骰子数：" << e_randon << endl;
+				outfile << "敌方行棋为： " << c << ' ' << "走 " << tx << ',' << ty << endl;
+				outfile.close();
+
 				cout << "当前棋盘：\n";
 				for (int i = 0; i < 5; i++) {
 					for (int j = 0; j < 5; j++)
@@ -129,6 +169,11 @@ void Game::game()
 				if (s == '1') {
 					movechessman(tx, ty, c_point.x, c_point.y, start);
 					a[tx][ty] = backup;
+					//保存操作到文本文档
+					outfile.open("output.txt", ios::app);
+					outfile << "敌方悔棋"  << endl;
+					outfile.close();
+
 					cout << "当前棋盘\n";
 					for (int i = 0; i < 5; i++) {
 						for (int j = 0; j < 5; j++)
@@ -164,6 +209,9 @@ void Game::game()
 					back_Board(p); turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
+					outfile.open("output.txt",ios::app);
+					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
+					outfile.close();
 				}
 				else {
 					Board_link* q=new Board_link;
@@ -210,6 +258,10 @@ void Game::game()
 					turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
+					//保存操作到文本文档
+					outfile.open("output.txt", ios::app);
+					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
+					outfile.close();
 					continue;
 				}
 
@@ -218,6 +270,12 @@ void Game::game()
 			cout << "请对手移动棋子\n";
 			while (1) {
 				char c;
+				char e_randon;
+				cin >> e_randon;
+				if (e_randon > '6' || e_randon < '1') {
+					cout << "输入有误，重新输入对手移动的棋子\n";
+					continue;
+				}
 				cin >> c;
 				point c_point = findchessman(c);
 				int tx, ty;
@@ -229,6 +287,13 @@ void Game::game()
 				//备份移动吃的棋子
 				char backup = a[tx][ty];
 				movechessman(c_point.x, c_point.y, tx, ty, start);
+
+				//保存操作到文本文档
+				outfile.open("output.txt", ios::app);
+				outfile << "敌方掷得骰子数：" << e_randon << endl;
+				outfile << "敌方行棋为： " << c << ' ' << "走 " << tx << ',' << ty << endl;
+				outfile.close();
+
 				cout << "当前棋盘\n";
 				for (int i = 0; i < 5; i++) {
 					for (int j = 0; j < 5; j++)
@@ -241,6 +306,12 @@ void Game::game()
 				if (s == '1') {
 					movechessman(tx, ty, c_point.x, c_point.y, start);
 					a[tx][ty] = backup;
+
+					//保存操作到文本文档
+					outfile.open("output.txt", ios::app);
+					outfile << "敌方悔棋" << endl;
+					outfile.close();
+
 					cout << "当前棋盘\n";
 					for (int i = 0; i < 5; i++) {
 						for (int j = 0; j < 5; j++)
@@ -303,6 +374,14 @@ void Game::game()
 			movechessman(next.x, next.y, next.x + ai->judge->legal[select].x, next.y + ai->judge->legal[select].y, start);
 			ai->judge->set_board(a);
 			ai->judge->set_new_Board();
+
+			//保存操作到文本文档
+			outfile.open("output.txt", ios::app);
+			outfile << "我方掷得骰子数：" << rand << endl;
+			outfile << "我方行棋为： " << findchessname(ai->judge->new_board, chessnumber, 1) << ' ' << "走 " << next.x + ai->judge->legal[select].x << ',' << next.y + ai->judge->legal[select].y << endl;
+			outfile.close();
+
+
 			cout << "当前棋盘\n";
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 5; j++)
@@ -334,6 +413,9 @@ void Game::game()
 					turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
+					outfile.open("output.txt", ios::app);
+					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
+					outfile.close();
 				}
 				else {
 					Board_link* q = new Board_link;
@@ -367,6 +449,19 @@ void Game::delete_board(Board_link* p)
 	Board_link* q = p->last;
 	delete p;
 	return delete_board(q);
+}
+
+char Game::findchessname(char b[5][5], int n, int team)
+{
+
+	for (int i = 0; i < 5; i++)
+		for (int j = 0; j < 5; j++)
+			if (team == 1) {
+				if (n == b[i][j] - 'A' + 1)return b[i][j];
+			}
+			else if (n == b[i][j] - 'a' + 1)return b[i][j];
+
+	return 0;
 }
 
 

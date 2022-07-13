@@ -142,9 +142,9 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 		if (judge->validMove(fx, fy, fx + judge->legal[i].x, fy + judge->legal[i].y, 1)) {
 			double v = root->child[0][i]->v;
 			double n = root->child[0][i]->n;
-			double now_score = n;
+			double now_score = v/n;
 			if (now_score > score) { score = now_score; flag = i; }
-			
+			cout << now_score << ' ' <<  n << endl;
 		}
 
 	}
