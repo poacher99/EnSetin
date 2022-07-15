@@ -1,0 +1,10 @@
+release/export.o
+release/main.o
+release/widget.o
+release/dialog.o
+release/gamewindow1.o
+release/gamewindow2.o
+release/moc_widget.o
+release/moc_dialog.o
+release/moc_gamewindow1.o
+release/moc_gamewindow2.o

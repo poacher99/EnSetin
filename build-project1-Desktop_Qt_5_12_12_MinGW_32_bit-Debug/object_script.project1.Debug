@@ -1,0 +1,10 @@
+debug/export.o
+debug/main.o
+debug/widget.o
+debug/dialog.o
+debug/gamewindow1.o
+debug/gamewindow2.o
+debug/moc_widget.o
+debug/moc_dialog.o
+debug/moc_gamewindow1.o
+debug/moc_gamewindow2.o
