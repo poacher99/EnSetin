@@ -1,5 +1,8 @@
 #include "Game.h"
 #include<vector>
+#include<ctime>
+#pragma warning(disable : 4996)
+
 
 Game::Game(char b[5][5], int flag, int start)
 {
@@ -11,22 +14,39 @@ Game::Game(char b[5][5], int flag, int start)
 	for (int i = 0; i < 5; i++)
 		for (int j = 0; j < 5; j++)root->now_a[i][j] = a[i][j];
 
+	info[1] = info[1] + "R:A5-";
+	info[1] = info[1] + i2a(b[0][0] - 'A' + 1);
+	info[1] = info[1] + ";B5-";
+	info[1] = info[1] + i2a(b[0][1] - 'A' + 1);
+	info[1] = info[1] + ";C5-";
+	info[1] = info[1] + i2a(b[0][2] - 'A' + 1);
+	info[1] = info[1] + ";A4-";
+	info[1] = info[1] + i2a(b[1][0] - 'A' + 1);
+	info[1] = info[1] + ";B4-";
+	info[1] = info[1] + i2a(b[1][1] - 'A' + 1);
+	info[1] = info[1] + ";A3-";
+	info[1] = info[1] + i2a(b[2][0] - 'A' + 1);
+
+	info[2] = "B:E3-";
+	info[2] = info[2] + i2a(b[4][2] - 'a' + 1);
+	info[2] = info[2] + ";D2-";
+	info[2] = info[2] + i2a(b[3][3] - 'a' + 1);
+	info[2] = info[2] + ";E2-";
+	info[2] = info[2] + i2a(b[3][4] - 'a' + 1);
+	info[2] = info[2] + ";C1-";
+	info[2] = info[2] + i2a(b[4][2] - 'a' + 1);
+	info[2] = info[2] + ";D1-";
+	info[2] = info[2] + i2a(b[4][3] - 'a' + 1);
+	info[2] = info[2] + ";E1-";
+	info[2] = info[2] + i2a(b[4][4] - 'a' + 1);
+
 }
 
 void Game::game()
 {
-
-	//保存操作到文本文档
-	infile.open("input.txt", ios::app);
-	int play_counts;
-	infile >>play_counts;
-	infile.close();
-	outfile.open("output.txt", ios::app);
-	outfile <<'\n' << "第"<<play_counts<<"局：" << endl;
-	outfile.close();
-	outfile.open("input.txt");
-	outfile << play_counts+1 << endl;
-	outfile.close();
+	char o_x, o_y, n_x, n_y;
+	cout << "请输入敌方队伍名称\n";
+	cin >> enemy_name;
 
 
 	Board_link* p = root;
@@ -58,10 +78,9 @@ void Game::game()
 						for (int i = 0; i < 5; i++)
 							for (int j = 0; j < 5; j++)  a[i][j] = p->now_a[i][j];
 					}
-					//保存操作到文本文档
-					outfile.open("output.txt",ios::app);
-					outfile << "退回到上一个回合开始时的棋盘状态"<<endl;
-					outfile.close();
+					//操作存入info
+					info[info_index] = "返回到上一回合开始时的棋盘";
+					info_index++;
 
 					turn--;
 					ai->judge->set_board(a);
@@ -107,11 +126,12 @@ void Game::game()
 			ai->judge->set_board(a);
 			ai->judge->set_new_Board();
 
-			//保存操作到文本文档
-			outfile.open("output.txt",ios::app);
+			//保存操作到info
+			info_save(rand, next.x, next.y, next.x + ai->judge->legal[select].x, next.y + ai->judge->legal[select].y);
+			/*outfile.open("output.txt",ios::app);
 			outfile << "我方掷得骰子数：" << rand << endl;
 			outfile << "我方行棋为： " << findchessname(ai->judge->new_board, chessnumber, 1) << ' ' << "走 " << next.x + ai->judge->legal[select].x << ',' << next.y + ai->judge->legal[select].y<<endl;
-			outfile.close();
+			outfile.close();*/
 
 
 			cout << "当前棋盘：\n";
@@ -136,13 +156,12 @@ void Game::game()
 				char c;
 				char e_randon;
 				cin >> e_randon; 
-				if (e_randon < '1' || e_randon>'6') { cout << "输入有误，重新输入对手移动的棋子\n"; continue; }
 				cin >> c;
 				point c_point = findchessman(c);
 				int tx, ty;
 				cin >> tx >> ty;
 				if (cin.fail() == true)cin.clear();
-				if ((c_point.x - tx) > 1 || (c_point.y - ty) > 1 || c > 'f' || c < 'a' || (tx == c_point.x && ty == c_point.y)) {
+				if ((e_randon < '1' || e_randon>'6')||(c_point.x - tx) > 1 || (c_point.y - ty) > 1 || c > 'f' || c < 'a' || (tx == c_point.x && ty == c_point.y)) {
 					cout << "输入有误，重新输入对手移动的棋子\n"; continue;
 				}
 				
@@ -151,11 +170,12 @@ void Game::game()
 				char backup = a[tx][ty];
 				movechessman(c_point.x, c_point.y, tx, ty, start);
 
-				//保存操作到文本文档
-				outfile.open("output.txt", ios::app);
+				//保存操作到info
+				info_save(e_randon-'0', c_point.x, c_point.y, tx, ty);
+				/*outfile.open("output.txt", ios::app);
 				outfile << "敌方掷得骰子数：" << e_randon << endl;
 				outfile << "敌方行棋为： " << c << ' ' << "走 " << tx << ',' << ty << endl;
-				outfile.close();
+				outfile.close();*/
 
 				cout << "当前棋盘：\n";
 				for (int i = 0; i < 5; i++) {
@@ -169,10 +189,12 @@ void Game::game()
 				if (s == '1') {
 					movechessman(tx, ty, c_point.x, c_point.y, start);
 					a[tx][ty] = backup;
-					//保存操作到文本文档
-					outfile.open("output.txt", ios::app);
+					//保存操作到info
+					info[info_index] = "敌方悔棋";
+					info_index++;
+					/*outfile.open("output.txt", ios::app);
 					outfile << "敌方悔棋"  << endl;
-					outfile.close();
+					outfile.close();*/
 
 					cout << "当前棋盘\n";
 					for (int i = 0; i < 5; i++) {
@@ -209,9 +231,11 @@ void Game::game()
 					back_Board(p); turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
-					outfile.open("output.txt",ios::app);
+					info[info_index] = "返回到上一回合开始时的棋盘";
+					info_index++;
+					/*outfile.open("output.txt",ios::app);
 					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
-					outfile.close();
+					outfile.close();*/
 				}
 				else {
 					Board_link* q=new Board_link;
@@ -223,6 +247,9 @@ void Game::game()
 
 			}
 		}
+		int win = ai->judge->End();
+		save_game(win);
+
 		delete_board(p);
 		delete ai->judge;
 		delete ai;
@@ -258,10 +285,12 @@ void Game::game()
 					turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
-					//保存操作到文本文档
-					outfile.open("output.txt", ios::app);
+					//保存操作到info
+					info[info_index] = "返回到上一回合开始时的棋盘";
+					info_index++;
+					/*outfile.open("output.txt", ios::app);
 					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
-					outfile.close();
+					outfile.close();*/
 					continue;
 				}
 
@@ -272,27 +301,24 @@ void Game::game()
 				char c;
 				char e_randon;
 				cin >> e_randon;
-				if (e_randon > '6' || e_randon < '1') {
-					cout << "输入有误，重新输入对手移动的棋子\n";
-					continue;
-				}
 				cin >> c;
-				point c_point = findchessman(c);
 				int tx, ty;
 				cin >> tx >> ty;
+				point c_point = findchessman(c);
 				if (cin.fail() == true)cin.clear();
-				if ((c_point.x - tx) > 1 || (c_point.y - ty) > 1 || c > 'f' || c < 'a'||(tx==c_point.x&&ty==c_point.y)) {
+				if ((e_randon > '6' || e_randon < '1')||(c_point.x - tx) > 1 || (c_point.y - ty) > 1 || c > 'f' || c < 'a'||(tx==c_point.x&&ty==c_point.y)) {
 					cout << "输入有误，重新输入对手移动的棋子\n"; continue;
 				}
 				//备份移动吃的棋子
 				char backup = a[tx][ty];
 				movechessman(c_point.x, c_point.y, tx, ty, start);
 
-				//保存操作到文本文档
-				outfile.open("output.txt", ios::app);
+				//保存操作到info
+				info_save(e_randon-'0', c_point.x, c_point.y, tx, ty);
+				/*outfile.open("output.txt", ios::app);
 				outfile << "敌方掷得骰子数：" << e_randon << endl;
 				outfile << "敌方行棋为： " << c << ' ' << "走 " << tx << ',' << ty << endl;
-				outfile.close();
+				outfile.close();*/
 
 				cout << "当前棋盘\n";
 				for (int i = 0; i < 5; i++) {
@@ -307,10 +333,12 @@ void Game::game()
 					movechessman(tx, ty, c_point.x, c_point.y, start);
 					a[tx][ty] = backup;
 
-					//保存操作到文本文档
-					outfile.open("output.txt", ios::app);
+					//保存操作到info
+					info[info_index] = "敌方悔棋";
+					info_index++;
+					/*outfile.open("output.txt", ios::app);
 					outfile << "敌方悔棋" << endl;
-					outfile.close();
+					outfile.close();*/
 
 					cout << "当前棋盘\n";
 					for (int i = 0; i < 5; i++) {
@@ -375,11 +403,12 @@ void Game::game()
 			ai->judge->set_board(a);
 			ai->judge->set_new_Board();
 
-			//保存操作到文本文档
-			outfile.open("output.txt", ios::app);
+			//保存操作到info
+			info_save(rand, next.x, next.y, next.x + ai->judge->legal[select].x, next.y + ai->judge->legal[select].y);
+			/*outfile.open("output.txt", ios::app);
 			outfile << "我方掷得骰子数：" << rand << endl;
 			outfile << "我方行棋为： " << findchessname(ai->judge->new_board, chessnumber, 1) << ' ' << "走 " << next.x + ai->judge->legal[select].x << ',' << next.y + ai->judge->legal[select].y << endl;
-			outfile.close();
+			outfile.close();*/
 
 
 			cout << "当前棋盘\n";
@@ -413,9 +442,11 @@ void Game::game()
 					turn--;
 					ai->judge->set_board(a);
 					ai->judge->set_new_Board();
-					outfile.open("output.txt", ios::app);
+					info[info_index] = "返回到上一回合开始时的棋盘";
+					info_index++;
+					/*outfile.open("output.txt", ios::app);
 					outfile << "退回到上一个回合开始时的棋盘状态" << endl;
-					outfile.close();
+					outfile.close();*/
 				}
 				else {
 					Board_link* q = new Board_link;
@@ -429,10 +460,15 @@ void Game::game()
 
 			}
 		}
+		int win = ai->judge->End();
+		save_game(win);
+
+
 		delete_board(p);
 		delete ai->judge;
 		delete ai;
 	}
+	
 	return;
 }
 
@@ -462,6 +498,38 @@ char Game::findchessname(char b[5][5], int n, int team)
 			else if (n == b[i][j] - 'a' + 1)return b[i][j];
 
 	return 0;
+}
+
+char Game::i2a(int n)
+{
+	char c[10] = { '0','1','2','3','4','5','6','7','8','9'};
+	return c[n];
+
+}
+
+string Game::i2s(int n)
+{
+	string c[10] = { "0","1","2","3","4","5","6","7","8","9" };
+	return c[n];
+}
+
+void Game::info_save(int randon,int fx,int fy,int tx,int ty)
+{
+	string rand = i2s(randon);
+	char ox = x_axis[fx];
+	char oy = y_axis[fy];
+	char nx = x_axis[tx];
+	char ny = y_axis[ty];
+	
+	info[info_index] =  rand;
+	info[info_index] = info[info_index] + ";(";
+	info[info_index] = info[info_index] + ox;
+	info[info_index] = info[info_index] + oy;
+	info[info_index] = info[info_index] + ',';
+	info[info_index] = info[info_index] + nx;
+	info[info_index] = info[info_index] + ny;
+	info[info_index] = info[info_index] + ')';
+	info_index++;
 }
 
 
@@ -500,5 +568,36 @@ int Game:: findchessman(int fx,int fy) {
 	return c - 'A' + 1;
 }
 
+string Game:: getTime()  //2020-09-11 22:00:49 这个只能到秒
+{
+	time_t timep;
+	time(&timep);
+	char tmp[64];
+	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&timep));
+	return tmp;
+}
 
+void Game::save_game(int win)
+{
+	string now_time = getTime();
+	info[0] = "#[WTN][红方:钝角][蓝方:" + enemy_name;
+	info[0] = info[0] + "][";
+	if (flag == 1)info[0] = info[0] + "红方先手][";
+	else info[0] = info[0] + "蓝方先手][";
+	if (win == 1) {
+		info[0] = info[0] + "红方胜][";
+	}
+	else info[0] = info[0] + "蓝方胜][";
+	info[0] = info[0] + now_time;
+	info[0] = info[0] + " 成都][2022 CCGC]";
+
+	outfile.open("output.txt", ios::app);
+	int i = 0;
+	while (i < info_index) {
+		if (i > 2)outfile << i - 2 << ':';
+		outfile << info[i] << endl;
+		i++;
+	}
+	outfile.close();
+}
 

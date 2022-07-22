@@ -15,7 +15,6 @@ point findchessman(char chessman);
 
 point findchessman(int n);
 
-void game(int flag, int start);
 
 int main() {
 
@@ -34,8 +33,12 @@ int main() {
 		cin >> start;
 		if (start == 1)break;
 		char chessman1, chessman2;
-		cout << "请输入需要交换的棋子编号" << endl;
-		cin >> chessman1 >> chessman2;
+		while (1) {
+			cout << "请输入需要交换的棋子编号(红色方输入A-F，蓝色方输入a-f)" << endl;
+			cin >> chessman1 >> chessman2;
+			if ((chessman1 >= 'A' && chessman2 <= 'F') || (chessman1 >= 'a' && chessman2 <= 'f'))break;
+			else cout << "请重新输入正确的格式A-F或a-f";
+		}
 		if (abs(chessman1 - chessman2) > 5) { cout << "请输入同一阵营棋子" << endl; continue; }
 		point c1 = findchessman(chessman1);
 		point c2 = findchessman(chessman2);
