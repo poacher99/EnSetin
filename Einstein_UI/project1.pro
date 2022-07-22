@@ -21,9 +21,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-
+CONFIG += c++11 console
 SOURCES += \
+    export.cpp \
         main.cpp \
         widget.cpp \
     dialog.cpp \
@@ -31,6 +31,7 @@ SOURCES += \
     gamewindow2.cpp
 
 HEADERS += \
+    export.h \
         widget.h \
     dialog.h \
     gamewindow1.h \
@@ -41,3 +42,11 @@ FORMS += \
     dialog.ui \
     gamewindow1.ui \
     gamewindow2.ui
+
+
+
+
+unix|win32: LIBS += -L$$PWD/./ -lEnSetin
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
