@@ -90,6 +90,7 @@ pair<int, double> AI::UCT_Search(int fx, int fy) {
 							quit = 1;
 							break;
 						}
+						score = 0x7f7f7f;
 						double now_score = getUCTvalue(p->child[k][i], step % 2);
 						if (now_score > score) {
 							score = now_score; flag = i; flag2 = k;
@@ -194,7 +195,7 @@ double AI::getUCTvalue(tree* p, int camp) {
 	else {
 		double v = p->v;
 		double n = p->n;
-		return (1.0 * v / n) + sqrt(log(all) / n);
+		return (1-1.0 * v / n) + sqrt(log(all) / n);
 	}
 }
 
@@ -233,6 +234,7 @@ int AI::renewRandom() {
 void AI::back(tree* p, int win, int step) {
 	if (win != 1)return;
 	while (p) {
+		 
 		p->v++;
 		p = p->parent;
 	}
